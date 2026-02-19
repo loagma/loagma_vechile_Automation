@@ -25,6 +25,9 @@ dev = [
     "ruff>=0.1.0",
 ]
 
+[tool.setuptools]
+packages = ["app"]
+
 [build-system]
 requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
