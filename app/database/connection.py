@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.pool import QueuePool
 from sqlalchemy import text
 
 from app.config.settings import settings
@@ -24,9 +23,20 @@ async def init_db() -> None:
     global engine, async_session_maker
     
     try:
+        # Check if we need SSL (for cloud databases)
+        # Local databases (localhost, 127.0.0.1, 0.0.0.0) don't need SSL
+        needs_ssl = settings.db_host not in ['localhost', '127.0.0.1', '0.0.0.0']
+        
+        if needs_ssl:
+            # SSL for cloud databases (TiDB Cloud, AWS RDS, etc.)
+            connect_args = {"ssl": True}
+        else:
+            # No SSL for local databases
+            connect_args = {}
+        
         engine = create_async_engine(
             settings.database_url,
-            poolclass=QueuePool,
+            connect_args=connect_args,
             pool_size=settings.db_pool_size,
             max_overflow=settings.db_max_overflow,
             pool_timeout=settings.db_pool_timeout,

@@ -43,8 +43,13 @@ class Settings(BaseSettings):
     
     @property
     def database_url(self) -> str:
-        """Construct database URL for SQLAlchemy."""
-        return f"mysql+aiomysql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
+        """Construct database URL for SQLAlchemy with SSL for TiDB Cloud."""
+        # TiDB Cloud requires SSL connections
+        # For aiomysql, we need to pass ssl as a connect_arg
+        return (
+            f"mysql+aiomysql://{self.db_user}:{self.db_password}@"
+            f"{self.db_host}:{self.db_port}/{self.db_name}"
+        )
     
     def model_dump(self, **kwargs) -> dict:
         """Override to mask sensitive fields in output."""
