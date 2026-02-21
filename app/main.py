@@ -33,6 +33,10 @@ def create_app() -> FastAPI:
     # Register routers
     app.include_router(health.router, tags=["health"])
     
+    # Import and register allocation router
+    from app.api import allocation
+    app.include_router(allocation.router)
+    
     # Lifecycle events
     app.add_event_handler("startup", init_db)
     app.add_event_handler("shutdown", close_db)
