@@ -1,0 +1,8 @@
+# Ignore all generated output files
+*.html
+*.json
+*.csv
+*.txt
+
+# But keep the directory structure
+!.gitignore
