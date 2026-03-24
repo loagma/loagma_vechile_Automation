@@ -10,7 +10,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from database import SessionLocal
-from api.models.zone import PincodeAdd, PincodeResponse, PincodeListResponse, PincodeMove
+from api.models.zone import PincodeAdd, PincodeResponse, PincodeListResponse, PincodeMove, AllPincodesListResponse
+from typing import Optional
 
 router = APIRouter(prefix="/api/v1", tags=["pincodes"])
 
@@ -121,6 +122,72 @@ def list_zone_pincodes(zone_id: int, db: Session = Depends(get_db)):
             pincodes=pincodes
         )
         
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/pincodes", response_model=AllPincodesListResponse)
+def list_all_pincodes(
+    zone_id: Optional[int] = None,
+    zone_name: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    """
+    List all pincodes with zone metadata
+    """
+    try:
+        if skip < 0:
+            raise HTTPException(status_code=400, detail="skip must be >= 0")
+        if limit < 1 or limit > 1000:
+            raise HTTPException(status_code=400, detail="limit must be between 1 and 1000")
+
+        filters = []
+        params = {"skip": skip, "limit": limit}
+
+        if zone_id is not None:
+            filters.append("tcp.zone_id = :zone_id")
+            params["zone_id"] = zone_id
+
+        if zone_name is not None:
+            filters.append("tc.zone_name = :zone_name")
+            params["zone_name"] = zone_name
+
+        where_clause = f" WHERE {' AND '.join(filters)}" if filters else ""
+
+        count_query = (
+            "SELECT COUNT(*) "
+            "FROM trip_card_pincode tcp "
+            "JOIN trip_cards tc ON tcp.zone_id = tc.zone_id"
+            f"{where_clause}"
+        )
+        total = db.execute(text(count_query), params).fetchone()[0]
+
+        query = (
+            "SELECT tcp.id, tcp.zone_id, tc.zone_name, tcp.pincode, tcp.created_at "
+            "FROM trip_card_pincode tcp "
+            "JOIN trip_cards tc ON tcp.zone_id = tc.zone_id"
+            f"{where_clause} "
+            "ORDER BY tcp.pincode "
+            "LIMIT :limit OFFSET :skip"
+        )
+        result = db.execute(text(query), params)
+
+        pincodes = [
+            PincodeResponse(
+                id=row[0],
+                zone_id=row[1],
+                zone_name=row[2],
+                pincode=row[3],
+                created_at=row[4]
+            )
+            for row in result.fetchall()
+        ]
+
+        return AllPincodesListResponse(total=total, pincodes=pincodes)
+
     except HTTPException:
         raise
     except Exception as e:

@@ -21,20 +21,23 @@ DAY_CONFIGS = {
     }
 }
 
-# Area name to short code mapping (4 letters)
+# Area name to short code mapping (4 letters) - Smart zones based on delivery logic
 AREA_CODE_MAPPING = {
     "ATTAPUR": "ATTA",
-    "GOLCONDA": "GOLC",
-    "ASIF NAGAR": "ASIF",
-    "GUDIMALKAPUR": "GUDI",
+    "BANJARA HILLS": "BANJ",
+    "BEGUMPET": "BEGU", 
+    "SECUNDERABAD": "SECU",
+    "KUKATPALLY": "KUKA",
+    "GACHIBOWLI": "GACH",
+    "UPPAL": "UPPA",
+    "DILSUKHNAGAR": "DILS",
+    "MEHDIPATNAM": "MEHD",
+    "AMEERPET": "AMER",
+    "OLD CITY": "OLDC",
     "NARSINGI": "NARS",
-    "BEGUMPET": "BEGU",
-    "HAKIMPET": "HAKI",
-    "MANIKONDA": "MANI",
-    "HAFEEZPET": "HAFE",
-    "BADANGPET": "BADA",
-    "YOUSUFGUDA": "YOUS",
-    "BORABANDA": "BORA"
+    "BORABANDA": "BORA",
+    "OUTER AREAS": "OUTE",
+    "OTHER AREAS": "OTHE"
 }
 
 def generate_trip_name(area_name: str, trip_number: int) -> str:
@@ -75,59 +78,20 @@ def get_area_code(area_name: str) -> str:
     area_name = area_name.strip().upper()
     return AREA_CODE_MAPPING.get(area_name, area_name[:4])
 
-# Pincode to Area Mapping (Generated from Day 26 human allocations)
-PINCODE_TO_AREA = {
-    "500001": "YOUSUFGUDA",
-    "500003": "BEGUMPET",
-    "500004": "YOUSUFGUDA",
-    "500005": "BADANGPET",
-    "500006": "ASIF NAGAR",
-    "500008": "GOLCONDA",
-    "500016": "BEGUMPET",
-    "500018": "BORABANDA",
-    "500020": "BEGUMPET",
-    "500028": "ASIF NAGAR",
-    "500030": "ATTAPUR",
-    "500032": "HAFEEZPET",
-    "500034": "YOUSUFGUDA",
-    "500045": "BORABANDA",
-    "500048": "ATTAPUR",
-    "500049": "HAFEEZPET",
-    "500052": "ATTAPUR",
-    "500053": "BADANGPET",
-    "500057": "ASIF NAGAR",
-    "500058": "BADANGPET",
-    "500059": "BADANGPET",
-    "500061": "BEGUMPET",
-    "500064": "ATTAPUR",
-    "500073": "YOUSUFGUDA",
-    "500075": "NARSINGI",
-    "500077": "ATTAPUR",
-    "500084": "HAFEEZPET",
-    "500086": "NARSINGI",
-    "500089": "NARSINGI",
-    "500091": "NARSINGI",
-    "500096": "MANIKONDA",
-    "500097": "BADANGPET",
-    "500114": "BORABANDA",
-    "500264": "ATTAPUR",
-    "501359": "BADANGPET",
-}
+# Pincode to Area mapping is now handled by the database
+# See trip_cards and trip_card_pincode tables for current mappings
+# Use get_zone_from_pincode() function in order_fetcher.py to query zones
 
 def get_area_from_pincode(pincode: str) -> str:
     """
-    Get area name from pincode using the mapping
+    Get area name from pincode using the database mapping
+    This function is deprecated - use get_zone_from_pincode() in order_fetcher.py instead
     
     Args:
         pincode: Pincode string (e.g., "500048")
     
     Returns:
-        Area name (e.g., "ATTAPUR") or "UNKNOWN" if not found
+        Area name or "UNKNOWN" if not found
     """
-    if not pincode:
-        return "UNKNOWN"
-    
-    # Clean pincode (remove spaces, convert to string)
-    pincode = str(pincode).strip()
-    
-    return PINCODE_TO_AREA.get(pincode, "UNKNOWN")
+    print("⚠️  get_area_from_pincode() is deprecated. Use get_zone_from_pincode() from order_fetcher.py")
+    return "UNKNOWN"

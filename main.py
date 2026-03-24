@@ -9,7 +9,7 @@ import os
 # Add algo_generated_trips to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'algo_generated_trips'))
 
-from algo_generated_trips.api.routes import vehicles, zone_vehicles, pincodes, trips
+from algo_generated_trips.api.routes import vehicles, zone_vehicles, zones, pincodes, trips
 
 load_dotenv()
 
@@ -18,6 +18,7 @@ app = FastAPI(title="Loagma API")
 # Include API routers
 app.include_router(vehicles.router)
 app.include_router(zone_vehicles.router)
+app.include_router(zones.router)
 app.include_router(pincodes.router)
 app.include_router(trips.router)
 

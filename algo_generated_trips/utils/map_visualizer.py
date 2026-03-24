@@ -115,37 +115,25 @@ def create_trip_map(trip_data: dict, day: str, output_dir: str = "outputs") -> s
             # Create popup
             popup_html = create_order_popup(order, trip_name, color)
             
-            # Add circle marker
+            # Add small circle marker (like in the reference image)
             folium.CircleMarker(
                 location=[lat, lon],
-                radius=10,
+                radius=6,  # Smaller radius for precise pinpointing
                 popup=folium.Popup(popup_html, max_width=320),
-                color=color,
+                color='white',  # White border
                 fill=True,
                 fillColor=color,
-                fillOpacity=0.7,
-                weight=3
-            ).add_to(map_obj)
-            
-            # Add trip name label
-            folium.Marker(
-                location=[lat, lon],
-                icon=folium.DivIcon(html=f'''
-                    <div style="font-size: 9px; color: white; background-color: {color}; 
-                                padding: 2px 5px; border-radius: 3px; font-weight: bold;
-                                border: 1px solid white;">
-                        {trip_name}
-                    </div>
-                ''')
+                fillOpacity=0.9,
+                weight=2  # Thinner border
             ).add_to(map_obj)
         
-        # Draw route line
+        # Draw route line (thinner for better visibility)
         if len(trip_coords) > 1:
             folium.PolyLine(
                 locations=trip_coords,
                 color=color,
-                weight=4,
-                opacity=0.8,
+                weight=2.5,  # Thinner line
+                opacity=0.7,
                 popup=f"{trip_name} - {trip['order_count']} orders - {trip['total_weight']} kg"
             ).add_to(map_obj)
     

@@ -35,6 +35,16 @@ class ZoneListResponse(BaseModel):
     total: int
     zones: List[ZoneResponse]
 
+class ZoneSummaryResponse(BaseModel):
+    zone_id: int
+    zone_name: str
+    status: str
+    created_at: datetime
+
+class ZoneSummaryListResponse(BaseModel):
+    total: int
+    zones: List[ZoneSummaryResponse]
+
 # Zone-Vehicle Assignment Models
 class VehicleAssignment(BaseModel):
     vehicle_id: int = Field(..., description="Vehicle ID to assign")
@@ -74,3 +84,7 @@ class PincodeListResponse(BaseModel):
 
 class PincodeMove(BaseModel):
     new_zone_id: int = Field(..., description="Target zone ID")
+
+class AllPincodesListResponse(BaseModel):
+    total: int
+    pincodes: List[PincodeResponse]
